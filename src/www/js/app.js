@@ -63,6 +63,8 @@ new Vue({
     clientEditNameId: null,
     clientEditAddress: null,
     clientEditAddressId: null,
+    clientEditAllowedIPs: null,
+    clientEditAllowedIPsId: null,
     qrcode: null,
 
     currentRelease: null,
@@ -296,6 +298,11 @@ new Vue({
     },
     updateClientAddress(client, address) {
       this.api.updateClientAddress({ clientId: client.id, address })
+        .catch((err) => alert(err.message || err.toString()))
+        .finally(() => this.refresh().catch(console.error));
+    },
+    updateClientAllowedIPs(client, allowedIPs) {
+      this.api.updateClientAllowedIPs({ clientId: client.id, allowedIPs })
         .catch((err) => alert(err.message || err.toString()))
         .finally(() => this.refresh().catch(console.error));
     },
