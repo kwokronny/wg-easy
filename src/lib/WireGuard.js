@@ -194,20 +194,21 @@ ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
 
   async getClientConfiguration({ clientId }) {
     const config = await this.getConfig();
-    const allowedIPs = Object.values(config.clients).map((client) => client.allowedIPs).filter((ip) => ip);
+    const allowedIPs = Object.values(config.clients).filter((client) => client.clientId === clientId && client.allowedIPs).map((client) => client.allowedIPs);
     const client = await this.getClient({ clientId });
 
     return `
 [Interface]
 PrivateKey = ${client.privateKey ? `${client.privateKey}` : 'REPLACE_ME'}
 Address = ${client.address}/24
+${client.allowedIPs ? `PostUp = ${WG_POST_UP}\nPostDown = ${WG_POST_DOWN}` : ''}
 ${WG_DEFAULT_DNS ? `DNS = ${WG_DEFAULT_DNS}\n` : ''}\
 ${WG_MTU ? `MTU = ${WG_MTU}\n` : ''}\
 
 [Peer]
 PublicKey = ${config.server.publicKey}
 ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
-}AllowedIPs = ${WG_ALLOWED_IPS}, ${allowedIPs.join(', ')}
+}AllowedIPs = ${WG_ALLOWED_IPS}${allowedIPs.length ? `,${allowedIPs.join(', ')}` : ''}
 PersistentKeepalive = ${WG_PERSISTENT_KEEPALIVE}
 Endpoint = ${WG_HOST}:${WG_CONFIG_PORT}`;
   }
